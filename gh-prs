@@ -1,0 +1,31 @@
+#!/bin/bash
+
+log_msg() {
+    BLUE=$(tput setaf 4)
+    NORMAL=$(tput sgr0)
+    TITLE="$1"
+    URL="$2"
+
+    printf "%-*s %s\n" 60 "$BLUE$TITLE$NORMAL" "$URL"
+}
+
+case $1 in
+  approved)
+    query='is:pull-request author:@me state:open review:approved'
+    ;;
+  stale)
+    query='is:pull-request author:@me state:open archived:false'
+    ;;
+  requested)
+    query='is:open is:pr review-requested:@me archived:false '
+    ;;
+esac
+
+# use base64 so that we can pass each object as an array item
+for item in $(gh api -X GET search/issues -f q="${query}" | jq -r '.items[] | @base64'); do
+  content=$(echo "${item}" | base64 --decode)
+  title=$(jq -r ".title" <<< "${content}")
+  html_url=$(jq -r ".html_url" <<< "${content}")
+
+  log_msg "${title}" "${html_url}"
+done
