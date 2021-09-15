@@ -1,5 +1,5 @@
 # gh-approved-prs
-gh extension to list all your approved PRs
+gh extension to list all your approved PRs that have not been closed.
 
 ## Installation
 `gh extension install ian-bartholomew/gh-approved-prs`
