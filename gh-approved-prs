@@ -5,15 +5,14 @@ log_msg() {
     NORMAL=$(tput sgr0)
     TITLE="$1"
     URL="$2"
-    let COL=$(tput cols)-${#TITLE}
 
     printf "%-*s %s\n" 60 "$BLUE$TITLE$NORMAL" "$URL"
 }
 
 for item in $(gh api -X GET search/issues -f q='is:pull-request author:@me state:open review:approved' | jq -r '.items[] | @base64'); do
-  content=$(echo ${item} | base64 --decode)
-  title=$(jq -r ".title" <<< ${content})
-  html_url=$(jq -r ".html_url" <<< ${content})
+  content=$(echo "${item}" | base64 --decode)
+  title=$(jq -r ".title" <<< "${content}")
+  html_url=$(jq -r ".html_url" <<< "${content}")
 
   log_msg "${title}" "${html_url}"
 done
