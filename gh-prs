@@ -1,12 +1,14 @@
 #!/bin/bash
 
 log_msg() {
+    YELLOW=$(tput setaf 3)
     BLUE=$(tput setaf 4)
     NORMAL=$(tput sgr0)
     TITLE="$1"
-    URL="$2"
+    DAYS="$2"
+    URL="$3"
 
-    printf "%-*s %s\n" 60 "$BLUE$TITLE$NORMAL" "$URL"
+    printf "%-55s %-15s %s\n" "$BLUE$TITLE$NORMAL" "$YELLOW$DAYS$NORMAL" "$URL"
 }
 
 case $1 in
@@ -21,11 +23,21 @@ case $1 in
     ;;
 esac
 
+# table headers
+printf "%-46s %-6s %s\n" "[TITLE]" "[AGE]" "[LINK]"
+
 # use base64 so that we can pass each object as an array item
 for item in $(gh api -X GET search/issues -f q="${query}" | jq -r '.items[] | @base64'); do
   content=$(echo "${item}" | base64 --decode)
   title=$(jq -r ".title" <<< "${content}")
   html_url=$(jq -r ".html_url" <<< "${content}")
+  updated_at=$(jq -r ".created_at" <<< "${content}")
 
-  log_msg "${title}" "${html_url}"
+  # calculate how old they are
+  now=$(date +%s)
+  past=$(date +%s --date "${updated_at}")
+  difference=$((now-past))
+  days=$((difference/(3600*24)))
+
+  log_msg "${title}" "${days}d" "${html_url}"
 done
