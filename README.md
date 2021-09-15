@@ -1,4 +1,4 @@
-# gh-approved-prs
+# gh-prs
 gh extension to list all your actionable PRs.
 
 ## Installation
