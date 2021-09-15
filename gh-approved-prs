@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gh api -X GET search/issues \
+  -f q='is:pull-request author:@me state:open review:approved' \
+  | jq '.items[].html_url'
